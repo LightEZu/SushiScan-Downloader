@@ -17,9 +17,10 @@
 
 - 🖥️ **Interface graphique** moderne avec 8 thèmes (Midnight, Café, Cyberpunk, Synthwave, Nord, Rose Gold, Dracula, Ochin)
 - 📖 **Chapitre unique** ou **plage de chapitres** en une seule opération
+- 📦 **Mode multi-CBZ** — un fichier `.cbz` par chapitre avec **nom personnalisé** pour chacun
+- ✏️ **Nommage interactif** — une popup apparaît après chaque chapitre pour choisir le nom du fichier avant de passer au suivant
 - 🛡️ **Gestion Cloudflare** — Chrome s'ouvre, tu résous le captcha manuellement, le script reprend automatiquement
 - 🍪 **Injection de cookies** depuis Chrome pour éviter les erreurs 403
-- 📦 **Export `.cbz`** organisé par chapitre, compatible Kavita, Komga, CDisplayEx, etc.
 - 🔄 **Installation automatique** des dépendances au premier lancement (mode script)
 
 ---
@@ -62,10 +63,11 @@ python sushiscan_downloader.py
 |---|---|
 | **URL début** | URL du chapitre/tome à télécharger (ou du premier d'une plage) |
 | **URL fin** | URL du dernier chapitre — optionnel, pour télécharger une plage |
-| **Nom CBZ** | Nom personnalisé pour le fichier de sortie (sans `.cbz`) |
-| **Dossier de sortie** | Dossier où sera sauvegardé le `.cbz` |
+| **Nom CBZ** | Nom du fichier de sortie en mode CBZ unique (sans `.cbz`) |
+| **Dossier de sortie** | Dossier où seront sauvegardés les fichiers `.cbz` |
 | **Pause entre chapitres** | Délai en secondes entre chaque chapitre (recommandé : 30–60 s) |
 | **Mode headless** | Chrome invisible — **décocher** si Cloudflare bloque |
+| **Un fichier .cbz par chapitre** | Active le mode multi-CBZ avec nommage interactif |
 
 ---
 
@@ -85,40 +87,75 @@ URL fin   : https://sushiscan.net/the-boys-edition-deluxe-volume-3/
 
 ---
 
-## ⚙️ Fonctionnement
+## ⚙️ Modes de téléchargement
 
-Pour chaque chapitre, le script suit ce processus en 2 étapes :
-
-```
-1. Chrome s'ouvre sur la page
-   └── Si captcha Cloudflare → résous-le manuellement
-   └── Clique sur ✅ Continuer
-
-2. La page se recharge avec les images
-   └── Attends que toutes les images soient visibles
-   └── Clique sur ✅ Continuer
-
-3. Téléchargement automatique de toutes les pages
-4. Création du fichier .cbz
-```
-
-> 💡 Si Cloudflare te bloque après plusieurs chapitres, augmente la pause à **60 s ou plus** et désactive le mode headless.
-
----
-
-## 🗃️ Structure du CBZ généré
+### Mode CBZ unique (défaut)
+Tous les chapitres sont regroupés dans **un seul fichier `.cbz`**.
+Le nom est défini dans le champ "Nom CBZ" avant de démarrer.
 
 ```
-the-boys-volume-1-3.cbz
+the-boys-volumes-1-3.cbz
 ├── the-boys-edition-deluxe-volume-1/
 │   ├── 001.jpg
-│   ├── 002.jpg
 │   └── ...
 ├── the-boys-edition-deluxe-volume-2/
 │   └── ...
 └── the-boys-edition-deluxe-volume-3/
     └── ...
 ```
+
+### Mode multi-CBZ ✨
+Coche **"Un fichier .cbz par chapitre"** pour activer ce mode.
+
+Après le téléchargement de chaque chapitre, une **popup apparaît** :
+
+```
+┌─────────────────────────────────────┐
+│  Nom du fichier CBZ                 │
+│                                     │
+│  The Boys - Volume 1____            │
+│                                     │
+│        [Annuler]  [Confirmer]       │
+└─────────────────────────────────────┘
+```
+
+- Le nom est **pré-rempli** avec le slug de l'URL
+- Tu peux le **modifier librement** avant de confirmer
+- Appuie sur **Entrée** pour confirmer rapidement
+- Le `.cbz` est créé immédiatement et on passe au chapitre suivant
+
+Résultat :
+```
+Downloads/
+├── The Boys - Volume 1.cbz
+├── The Boys - Volume 2.cbz
+└── The Boys - Volume 3.cbz
+```
+
+---
+
+## 🔄 Fonctionnement étape par étape
+
+```
+Pour chaque chapitre :
+
+  1. Chrome s'ouvre sur la page
+     └── Captcha Cloudflare ? → résous-le manuellement
+     └── Clique ✅ Continuer
+
+  2. Attends que les images apparaissent
+     └── Clique ✅ Continuer
+
+  3. Téléchargement automatique des pages
+
+  4. Mode multi-CBZ → popup de nommage
+     └── Saisis le nom → Confirmer
+     └── CBZ créé immédiatement
+
+  5. Pause configurée → chapitre suivant
+```
+
+> 💡 Si Cloudflare te bloque après plusieurs chapitres, augmente la pause à **60 s ou plus** et décoche "Mode headless".
 
 ---
 
@@ -139,7 +176,7 @@ the-boys-volume-1-3.cbz
 
 ## 🔨 Compiler soi-même
 
-```bash
+```powershell
 # Installer PyInstaller
 pip install pyinstaller
 
@@ -172,7 +209,7 @@ python -m PyInstaller --onefile --windowed `
 | Chrome ne s'ouvre pas | Vérifie que Google Chrome est installé |
 | Cloudflare bloque en boucle | Augmente la pause à 60 s+, décoche "Mode headless" |
 | 0 image détectée | Passe en mode lecture verticale manuellement dans Chrome avant de cliquer Continuer |
-| L'app se lance en boucle | Ne pas compiler sans le flag `--windowed`, ou mettre à jour vers la dernière version |
+| Le bouton Continuer ne répond pas | Mets à jour vers la dernière version |
 
 ---
 
