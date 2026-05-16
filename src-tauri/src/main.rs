@@ -2,9 +2,11 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use tauri::Emitter;
+use tauri::Manager;
 use std::process::{Command, Stdio};
 use std::io::{BufRead, BufReader, Write};
 use std::sync::{Arc, Mutex};
+use std::os::windows::process::CommandExt;
 
 // ─── État global du process scraper ──────────────────────────────────────────
 
@@ -20,6 +22,7 @@ type SharedState = Arc<Mutex<ScraperState>>;
 /// Lance le scraper Node.js et établit la communication bidirectionnelle
 #[tauri::command]
 async fn run_downloader(
+    app: tauri::AppHandle,
     window: tauri::Window,
     state: tauri::State<'_, SharedState>,
     url_start: String,
@@ -41,16 +44,29 @@ async fn run_downloader(
         s.stdin = None;
     }
 
-    // Chemin absolu vers scraper.js, relatif à l'exécutable Tauri
-    let scraper_path = std::env::current_exe()
-        .map(|p| p.parent().unwrap().join("../../../src-tauri/bin/scraper.cjs"))
-        .unwrap_or_else(|_| std::path::PathBuf::from("./bin/scraper.cjs"));
+let scraper_path = app.path()
+        .resource_dir()
+        .map_err(|e| format!("Impossible de trouver resource_dir : {}", e))?
+        .join("bin")
+        .join("scraper.cjs");
+
+    // Nettoie le préfixe UNC \\?\ que Node.js ne supporte pas
+    let scraper_path_str = scraper_path.to_string_lossy()
+        .replace("\\\\?\\", "");
+
+    // Log du chemin pour debug
+    let _ = window.emit("scraper-message", serde_json::json!({
+        "type": "log",
+        "msg": format!("🔍 Chemin scraper : {:?}", scraper_path),
+        "tag": "info"
+    }).to_string());
 
     let mut child = Command::new("node")
-        .arg(&scraper_path)
+        .arg(&scraper_path_str)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
+        .creation_flags(0x08000000)
         .spawn()
         .map_err(|e| format!("Impossible de lancer Node.js : {} (chemin: {:?})", e, scraper_path))?;
 

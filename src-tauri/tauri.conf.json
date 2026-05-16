@@ -27,8 +27,10 @@
     "active": true,
     "targets": "all",
     "resources": [
-      "bin/scraper.cjs"
-    ],
+      "bin/scraper.cjs",
+      "bin/node_modules/**/*",
+      "bin/package.json"
+      ],  
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

@@ -7,6 +7,7 @@ const { chromium } = require("playwright");
 const { ZipArchive } = require("archiver");
 const fs = require("fs");
 const path = require("path");
+const os = require("os");
 const readline = require("readline");
 
 // ─── Communication IPC via stdout/stdin ───────────────────────────────────────
