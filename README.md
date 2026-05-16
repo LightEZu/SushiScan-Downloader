@@ -27,22 +27,32 @@
 
 ---
 
+## ⬇️ Installation recommandée
+
+👉 **[Télécharger le setup.exe depuis les Releases](../../releases/latest)**
+
+1. Télécharge `SushiScan-Downloader_x.x.x_x64-setup.exe`
+2. Lance l'installeur
+3. Suis les étapes — l'app s'installe avec un raccourci dans le menu démarrer
+
+> ⚠️ Windows Defender peut signaler le fichier — c'est un faux positif courant avec les apps Tauri. Le code source est entièrement disponible ici.
+
+---
+
 ## 📋 Prérequis
 
-Avant d'installer l'application, assure-toi d'avoir :
+Quelle que soit la méthode d'installation, tu as besoin de :
 
 | Logiciel | Version minimale | Lien |
 |---|---|---|
 | **Google Chrome** | Toute version récente | [Télécharger](https://www.google.com/chrome/) |
 | **Node.js** | 18+ | [Télécharger](https://nodejs.org/) |
-| **Rust** | stable | [Télécharger](https://rustup.rs/) |
-| **Git** | Toute version | [Télécharger](https://git-scm.com/) |
 
 > ⚠️ **Google Chrome est obligatoire** — l'application l'utilise pour contourner la protection Cloudflare de SushiScan. Chrome doit être installé dans son emplacement par défaut : `C:/Program Files/Google/Chrome/Application/chrome.exe`
 
 ---
 
-## 🚀 Installation
+## 🔧 Installation depuis les sources
 
 ```bash
 # 1. Clone le repo
