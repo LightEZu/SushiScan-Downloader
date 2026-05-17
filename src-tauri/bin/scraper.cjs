@@ -337,6 +337,7 @@ async function run(params) {
         const name = r.name || entrySlug;
         status("Création du CBZ…");
         const cbzPath = await makeCbz({ [entrySlug]: imgs }, name, outDir, [{ url, slug: entrySlug }]);
+        fs.rmSync(path.join(outDir, "_sushi_tmp"), { recursive: true, force: true });
         log(`📦 ${path.basename(cbzPath)}`, "ok");
         createdCbz.push(cbzPath);
       } else {
@@ -367,6 +368,7 @@ async function run(params) {
     status("Création du CBZ…");
     try {
       const cbzPath = await makeCbz(allImages, cbzName, outDir, entries);
+      fs.rmSync(path.join(outDir, "_sushi_tmp"), { recursive: true, force: true });
       log(`\n🎉 CBZ créé : ${cbzPath}`, "ok");
       send("done", { success: true, cbzPath, outDir });
     } catch (e) {
